@@ -68,7 +68,7 @@ io.sockets.on('connection', function(socket, callback){
 	function newUser(data, callback){
 		var defaultRoom = 'Lobby';
 		var defaultMemberStatus = 'Anggota';
-		var ip = socket.request.connection.remoteAddress;
+		var ip = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;	
 		var host = socket.request.connection.remotePort;
 		
 		callback(true);
@@ -340,7 +340,7 @@ io.sockets.on('connection', function(socket, callback){
 							console.log(users[name].memberStatus + ' tidak dapat dibanned oleh ' + socket.memberStatus);
 						}else{
 							//users[name].ipaddress = data;
-							var ip = users[name].request.connection.remoteAddress;					
+							var ipban = users[name].request.headers['x-forwarded-for'] || users[name].request.connection.remoteAddress;							
 							ipbanned.push(ipban);
 							console.log(ipban);
 							users[name].emit('pesandibanned', {nick: socket.nickname, memberStatus: socket.memberStatus, msg: msg});
