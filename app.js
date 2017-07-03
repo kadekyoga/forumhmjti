@@ -70,7 +70,7 @@ io.sockets.on('connection', function(socket, callback){
 		var defaultMemberStatus = 'Anggota';
 		
 		var ip;
-		var stringip = socket.request.headers('x-forwarded-for'); 
+		var stringip = socket.request.headers['x-forwarded-for']; 
 		if (stringip) {
 			var stringip = stringip.split(',');
 			ip = stringip[0];
