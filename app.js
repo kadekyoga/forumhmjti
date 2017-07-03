@@ -68,7 +68,16 @@ io.sockets.on('connection', function(socket, callback){
 	function newUser(data, callback){
 		var defaultRoom = 'Lobby';
 		var defaultMemberStatus = 'Anggota';
-		var ip = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;	
+		
+		var ip;
+		var stringip = socket.request.headers('x-forwarded-for'); 
+		if (stringip) {
+			var stringip = stringip.split(',');
+			ip = stringip[0];
+		}else if (!ipAddress) {
+			ip = socket.request.connection.remoteAddress;
+		}
+				
 		var host = socket.request.connection.remotePort;
 		
 		callback(true);
@@ -340,9 +349,18 @@ io.sockets.on('connection', function(socket, callback){
 							console.log(users[name].memberStatus + ' tidak dapat dibanned oleh ' + socket.memberStatus);
 						}else{
 							//users[name].ipaddress = data;
-							var ipban = users[name].request.headers['x-forwarded-for'] || users[name].request.connection.remoteAddress;							
-							ipbanned.push(ipban);
-							console.log(ipban);
+							//var ipban = users[name].request.headers['x-forwarded-for'] || users[name].request.connection.remoteAddress;
+
+							var ip;
+							var stringip = users[name].request.headers['x-forwarded-for']; 
+							if (stringip) {
+								var stringip = stringip.split(',');
+								ip = stringip[0];
+							}else if (!ip) {
+								ip = socket.request.connection.remoteAddress;
+							}							
+							ipbanned.push(ip);
+							console.log(ip);
 							users[name].emit('pesandibanned', {nick: socket.nickname, memberStatus: socket.memberStatus, msg: msg});
 							users[name].emit('disablechat', {nick: name});
 							console.log(users[name] + 'Meninggalkan room ' + socket.room);							
