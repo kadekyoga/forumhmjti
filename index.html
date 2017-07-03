@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimal-ui" />
+	<title>Chat template</title>
+	<link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	
+	<style>
+		input[type=text]{
+			width: 100%;
+			background-color: #FFF;
+			padding: 12px 20px;
+			margin: 8px 0;
+			display: inline-block;
+			border: 2px solid #26a69a;
+			border-radius: 4px;
+			box-sizing: border-box;
+		}
+	</style>
+</head>
+
+<body style="height: 100%; width:100%; overflow:hidden; background-image: url('images/wabg.jpg');">
+	<div id="nickWrap">
+		<p><b> Masukkan Nickname anda : </b></p>		
+		<form id="setNick" autocomplete="off" class="col s10 m10 l10">
+			<input placeholder="Nickname: Max 8 Karakter" id="nickname" type="text" class="validate col s8 m9 l10">
+			<input id="send" type="submit" value="masuk" class="btn"></input>
+			<a id="help" class="btn">Help</a>
+		</form>
+		
+		<div id="saranNickname">
+			<p id="nickError"></p>
+			<span id="nickError2">
+			</span>
+			<div id="prosedur" hidden>
+				<ol>
+					<li><p><b>Dilarang</b> menggunakan <b>Spasi</b> saat menginputkan nickname</p></li>
+					<li><p>Klik pada <b>Nickname Tujuan</b> untuk melakukan private chat</p></li>
+					<li><p>Ketik <b>Nama Room</b> pada kolom input dan tekan tombol <b>+</b> untuk <b>Membuat</b> room baru</p></li>
+					<li><p>Klik pada <b>Nama Room</b> yang telah ada untuk dapat <b>Join</b> kedalam room tersebut</p></li>
+					<li><p><b>Refresh browser</b> atau <b>Tekan tombol Back pada browser/device</b>
+						atau klik link <b>Logout</b> untuk keluar dari aplikasi</p></li>
+					<li><p><b>File APK dapat diunduh di <a href="https://docs.google.com/uc?export=download&id=0BwIaBK_dUCLSUlkwSmNVMThGSGs">hmjtichat.apk</a></b></p></li>
+				</ol>
+			</div>
+		</div>		
+	</div>
+
+	<div id="contentWrap" style="display: none;">
+	<div class="row">
+		<div class="navigasi">
+			<nav>
+				<div class="nav-wrapper">
+				<a href="#" class="brand-logo center">HMJTI CHAT</a>
+				<a href="#" data-activates="mobile" class="button-collapse">
+					<i class="medium material-icons">menu</i>
+				</a>
+				<div class="side-nav" id="mobile" style="border:2px solid #a1a1a1;">
+					<a href="#" class="btn">Online Users</a>
+					<div id="online-users" style="height:50%; overflow-y:scroll;">
+						<ul id="listUser">
+						</ul>
+					</div>
+					
+					<a href="#" class="btn">Rooms</a>
+					<div class="container">
+						<form id="setRoom" style="color:#000;" autocomplete="off">
+							<input id="roomname" placeholder="Max 10 Karakter" maxlength="10" class="col s10"
+								style="width:80%;	background-color: #FFF; padding: 12px 20px;	margin: 8px 0; display: inline-block; border: 2px solid #26a69a; border-radius: 4px; box-sizing: border-box;"></input>
+							<input type="submit" id="kirimroom" value="+" class="col s2 btn" style="margin-top: 10px;"></input>
+						</form>
+					</div>
+					<div style="padding: 0px; margin:0px; clear: both;"></div>
+					<div id="rooms" style="height:50%; overflow-y:scroll;">
+						<ul id="listRoom">
+						</ul>
+					</div>
+				</div>
+				</div>
+			</nav>
+		</div>
+	
+		<div class="row col s0 m0 l3">
+			<div id="slide-out" class="side-nav fixed" style="height: 100%;">
+				<a href="#" class="btn" style="color: #fff;">Online Users</a>
+				<div id="online-users" style="height:50%; overflow-y:scroll;">
+					<ul id="listUser">
+					</ul>
+				</div>
+				
+				<a href="#" class="btn" style="color: #fff;">Rooms</a>
+					<div class="container">
+						<form id="setRoom2" style="color:#000;" autocomplete="off">
+							<input id="roomname2" placeholder="Max 10 Karakter" maxlength="10" class="col s10"
+								style="width:80%;	background-color: #FFF; padding: 12px 20px;	margin: 8px 0; display: inline-block; border: 2px solid #26a69a; border-radius: 4px; box-sizing: border-box;"></input>
+							<input type="submit" id="kirimroom2" value="+" class="col s2 btn" style="margin-top: 10px;"></input>
+						</form>
+					</div>
+					<br /><br /><br />
+					<div id="rooms" style="height:50%; overflow-y:scroll;">
+						<ul id="listRoom2">
+						</ul>
+					</div>
+			</div>
+		</div>
+		
+		<div class="chatWrap col s12 m12 l9" style="height: 70vh;">
+			<div id="akunmu" style="max-width: 97%; padding: 10px;">
+				<span id="nickmu"></span>
+				<span id="roommu"></span>
+				<span id="logout"></span>
+			</div>
+		
+			<div id="chat" style="height:68vh; overflow-y: auto; max-width: 97%; word-wrap: break-word;">
+			</div>
+			
+			<div style="max-width: 97%; position:relative;">
+				<form id="input-field" autocomplete="off">
+					<input placeholder="Your Chat" id="your_chat" type="text" class="validate col s8 m9 l10">
+					<input id="kirim" type="submit" value="Send" class="btn" style="margin-top: 10px;"></input>
+				</form>
+			</div>
+			<div style="padding: 0px; margin:0px; clear: both;"></div>
+		</div>
+	</div>
+</div>
+	
+	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+	<script src="js/materialize.js"></script>
+	<script>
+		//initialize
+		$('.button-collapse').sideNav({
+			menuWidth: 300, // Default is 240
+			edge: 'left', // Choose the horizontal origin
+			closeOnClick: true // Closes side-nav on <a> clicks, useful for Angular/Meteor
+		});		
+		$('#your_chat').trigger('autoresize');
+	</script>
+
+	<!-- Penanaman jquery dan websocket -->
+	<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		jQuery(function($){
+			//membangun koneksi client
+			var socket = io.connect();
+			
+			//bagian inputan untuk nickname/username
+			var $nickForm = $('#setNick');
+			var $nickError = $('#nickError');
+			var $nickBox = $('#nickname');
+			
+			//bagian inputan untuk pesan/message
+			var $messageForm = $('#input-field');
+			var $messageBox = $('#your_chat');
+			var $chat = $('#chat');
+			
+			//bagian inputan untuk room versi web
+			var $roomForm = $('#setRoom');
+			var $roomBox = $('#roomname');
+			//bagian inputan untuk room versi mobile
+			var $roomForm2 = $('#setRoom2');
+			var $roomBox2 = $('#roomname2');
+			
+			//bagian untuk help di halaman awal
+			$('#help').click(function(){
+				$('#prosedur').toggle();
+			});
+			
+			
+			//ketika inputan username di submit
+			$nickForm.submit(function(e){
+				e.preventDefault();
+				var $nickname = $nickBox.val();
+				if($nickname.indexOf(' ') >= 1){
+					$nickError.html('Nickname tidak boleh berisi spasi!!!');
+				}else			
+				if($nickBox.val() == ""){
+					$nickError.html('Kolom nickname tidak boleh kosong!!!');
+				}else{
+				//emit (kirim) data ke event new user dan kosongkan kolom inputan
+				socket.emit('new user', $nickBox.val(), function(data){
+					//jika data yang dikirimkan berhasil terdaftar, tampilan awal di sembunyikan
+					//dan tampilkan jendela chat
+					if(data){
+						$('#nickWrap').hide();
+						$('#contentWrap').show();
+						//terima data yang dikirim dari event akunmu dan tampilkan di html
+						socket.on('akunmu', function(data){
+							$('#nickmu').html('<b style="color: #26a69a;">' + data.memberStatus + ' ' + data.nick + '</b>');
+							$('#roommu').html('berada di ' + '<b style="color: #26a69a;">' + data.room + '</b>');
+							$('#logout').html('<u><a href="https://hmjtichat.herokuapp.com">( Logout )</a></u>');
+						});
+					//ketika username sudah digunakan, acak angka setelah username yang diinputkan
+					//dan jadikan saran utk digunakan
+					}else{
+						$nickError.empty();
+						$('#nickError2').empty();
+						$nickError.html('That username is already taken! Try again.');
+						$('#nickError2').append('Nickname yang mungkin dapat anda gunakan : <br /><ul>'
+							+ '<li class="li1">' + $nickBox.val() + '_' + Math.floor((Math.random() * 100) + 1) + '</li>'
+							+ '<li class="li2">' + $nickBox.val() + '_' + Math.floor((Math.random() * 1000) + 1) + '</li>'
+							+ '<li class="li3">' + $nickBox.val() + '_' + Math.floor((Math.random() * 10000) + 1) + '</li>'
+							+'</ul></span>'
+						);
+						$nickBox.val($nickBox.val() + '_' + Math.floor((Math.random() * 100) + 1));
+					}
+				});
+				}
+			});
+			
+			
+			socket.on('andadibanned', function(data){
+				$chat.append('<center><span class="whisper"><b> Pesan Admin : <br/> </b>' + 'Anda masih di banned' + '</span></center><br/>');
+			});
+			
+			
+			//membaca data username dari event usernames
+			//ambil semua data dari array users yang terbaru, dan tampilkan di html
+			socket.on('usernames', function(data){
+				$('ul#listUser').empty();
+				for(var i=0; i < data.length; i++){
+					$('ul#listUser').append('<li><a href="javascript: void(0)">' + data[i] + '</a></li>');
+				}
+				//ketika salah satu nama user di klik
+				//maka di jendela inputan chat akan terisi /w <username> untuk mengirim pesan private
+				$('ul#listUser li').click(function(){
+					$('#your_chat').val('/w ' + $(this).text() + ' ');
+				});				
+			});
+			
+			
+			//ketika nama room di submit (versi web)
+			$roomForm.submit(function(e){
+				e.preventDefault();
+				//kirim inputan sebagai data ke event new rooms
+				socket.emit('new rooms', $roomBox.val(), function(data){
+					$('#chat').empty();
+				});
+				$roomBox.val('');
+				
+				socket.on('statuspindah', function(data){
+					$chat.append('<span> <b>' + data.room + ': </b>' + data.status + '</span><br/><br/><br/>');
+				});
+				
+				//terima data dari event roommu utk menampilkan informasi room client berada saat itu
+				socket.on('roommu', function(data){
+					$('#roommu').html('di room ' + '<b style="color: #26a69a;">' + data.room + '</b>');
+				});
+			});
+			
+			//sama seperti diatas namun (versi mobile)
+			$roomForm2.submit(function(e){
+				e.preventDefault();
+				socket.emit('new rooms', $roomBox2.val(), function(data){
+					$('#chat').empty();
+				});
+				$roomBox2.val('');
+				
+				socket.on('statuspindah', function(data){
+					$chat.append('<span>Room  <b>' + data.room + ': </b>' + data.status + '</span><br/><br/><br/>');
+				});
+				
+				socket.on('roommu', function(data){
+					$('#roommu').html('di room ' + '<b style="color: #26a69a;">' + data.room + '</b>');
+				});
+			});
+			
+			
+			//terima data dari event roomlist utk mendapatkan daftar room dari array rooms (versi web)
+			socket.on('roomlist', function(data){
+				$('ul#listRoom').empty();
+				for(var i=0; i < data.length; i++){
+					$('ul#listRoom').append('<li><a href="javascript: void(0)">' + data[i] + '</a></li>');
+				}
+				//jika salah satu daftar room di klik, maka akan mengirim nama room yang dipilih
+				//sebagai data ke event new rooms (bergabung dengan room)
+				$('ul#listRoom li').click(function(){
+					$('#roomname').val($(this).text());
+					socket.emit('new rooms', $('#roomname').val(), function(data){
+						$('#chat').empty();
+					});
+					
+				socket.on('statuspindah', function(data){
+					$chat.append('<span>Room  <b>' + data.room + ': </b>' + data.status + '</span><br/><br/><br/>');
+				});
+					
+					$roomBox.val('');
+					socket.on('roommu', function(data){
+						$('#roommu').html('di room ' + '<b style="color: #26a69a;">' + data.room + '</b>');
+					});
+				});	
+			});
+			
+			
+			//sama seperti diatas (versi mobile)
+			socket.on('roomlist', function(data){
+				$('ul#listRoom2').empty();
+				for(var i=0; i < data.length; i++){
+					$('ul#listRoom2').append('<li><a href="javascript: void(0)">' + data[i] + '</a></li>');
+				}
+				$('ul#listRoom2 li').click(function(){
+					$('#roomname2').val($(this).text());
+					socket.emit('new rooms', $('#roomname2').val(), function(data){
+						$('#chat').empty();
+					});
+					$roomBox2.val('');
+					
+					socket.on('statuspindah', function(data){
+						$chat.append('<span>Room  <b>' + data.room + ': </b>' + data.status + '</span><br/><br/><br/>');
+					});
+					
+					socket.on('roommu', function(data){
+						$('#roommu').html('di room ' + '<b style="color: #26a69a;">' + data.room + '</b>');
+					});
+				});	
+			});
+			
+			
+			//ketika pesan (chat) dikirim ke event send message
+			$messageForm.submit(function(e){
+				e.preventDefault();
+				socket.emit('send message', $messageBox.val(), function(data){
+					$chat.append('<span> <b>' + data + '</span><br/>');
+				});
+				//setelah pesan dikirim kolom inputan dikosongkan
+				$messageBox.val('');
+			});
+			
+			//terima data (chat) yang telah di cek dan tampilkan di jendela chat
+			socket.on('new message', function(data){
+				//$chat.append('<b>' + data.nick + ': </b>' + data.msg + "<br/>");
+				displayMessage(data);
+				ubahJadiLink();
+				$('#chat').scrollTop($('#chat')[0].scrollHeight);
+			});
+			
+			
+			//terima data dari event load old message (chat history)
+			//yang dibaca dari database mongoDB
+			socket.on('load old messages', function(docs){
+				/*for(var i=0; i<=docs.length-1; i++){
+					displayMessage(docs[i]);
+				} */
+				for(var i=docs.length-1; i>=0; i--){
+					displayMessage(docs[i]);
+					ubahJadiLink();
+					$('#chat').scrollTop($('#chat')[0].scrollHeight);
+				}
+			});
+			
+			function displayMessage(data){
+				$chat.append('<span> <b>' + data.nick + ': </b>' + data.msg + '</span><br/>' + data.created + '<br/><br/>');
+			}
+			
+			
+			//tampilan untuk penerima (private chat)
+			socket.on('whisper', function(data){
+				$chat.append('<span class="whisper"> <b> From ' + data.sender + ':<br/> </b>' + data.msg + '</span><br/>' + data.created + '<br/><br/>');
+				ubahJadiLink();
+				$('#chat').scrollTop($('#chat')[0].scrollHeight);
+			});
+			
+			
+			//tampilan untuk pengirim (private chat)
+			socket.on('sender', function(data){
+				$chat.append('<span class="sender"> <b> To ' + data.receiver + ':<br/> </b>' + data.msg + '</span><br/>' + data.created + '<br/><br/>');
+				ubahJadiLink();
+				$('#chat').scrollTop($('#chat')[0].scrollHeight);
+			});
+			
+			//tampilan untuk jadi admin
+			socket.on('statusadmin', function(data){
+				$('#nickmu').html('<b style="color: #26a69a;">' + data.memberStatus + ' ' + data.nick + '</b>');				
+			});
+			
+			//tampilan untuk jadi moderator
+			socket.on('statusmomod', function(data){
+				$('#nickmu').html('<b style="color: #26a69a;">' + data.memberStatus + ' ' + data.nick + '</b>');				
+			});
+			
+			socket.on('pesanadmin', function(data){
+				$chat.append('<center><span class="whisper"><b>Admin ' + data.sender + ':<br/> </b>' + data.msg + '</span></center><br/>');
+				ubahJadiLink();
+				$('#chat').scrollTop($('#chat')[0].scrollHeight);
+			});
+			
+			socket.on('pesandikick', function(data){
+				$chat.append('<center><span class="whisper"><b> '+ data.memberStatus + ' ' + data.nick + ':<br/> </b>' + data.msg + '</span></center><br/>');
+				ubahJadiLink();
+				$('#chat').scrollTop($('#chat')[0].scrollHeight);
+			});	
+			
+			socket.on('pesandibanned', function(data){
+				$chat.append('<center><span class="whisper"><b> '+ data.memberStatus + ' ' + data.nick + ':<br/> </b>' + data.msg + '</span></center><br/>');
+				ubahJadiLink();
+				$('#chat').scrollTop($('#chat')[0].scrollHeight);
+			});	
+			
+			socket.on('disablechat', function(data){
+				document.getElementById('your_chat').disabled = true;
+				document.getElementById('kirim').disabled = true;
+				document.getElementById('roomname').disabled = true;
+				document.getElementById('roomname2').disabled = true;
+				document.getElementById('kirimroom').disabled = true;
+				document.getElementById('kirimroom2').disabled = true;
+			});
+			
+			socket.on('bersihkan jendela', function(data){
+				$chat.empty();
+			});	
+			
+			
+			//coba-coba regular expression utk deteksi teks berawalan https:// menjadi link
+			function ubahJadiLink(){
+				var str = $chat.html();
+				var regex = /(https?:\/\/([-\w\.]+)+(:\d+)?(\/([\w\/_\.]*(\?\S+)?)?)?)/ig
+				var replaced_text = str.replace(regex, "<a href='$1' target='_blank'>$1</a>");
+				$chat.html(replaced_text);
+			}
+			
+		});
+	</script>	
+</body>
+
+</html>
