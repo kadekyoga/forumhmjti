@@ -74,7 +74,7 @@ io.sockets.on('connection', function(socket, callback){
 		if (stringip) {
 			var stringip = stringip.split(',');
 			ip = stringip[0];
-		}else if (!ipAddress) {
+		}else if (!ip) {
 			ip = socket.request.connection.remoteAddress;
 		}
 				
@@ -91,7 +91,6 @@ io.sockets.on('connection', function(socket, callback){
 		if (ipbanned.indexOf(socket.ipaddress) !== -1 ){
 			callback(false);
 			socket.emit('andadibanned', {nick: data, room: defaultRoom, memberStatus: defaultMemberStatus});
-			users[name].emit('disablechat', {nick: name});
 		}else{
 			users[socket.nickname] = socket;
 			socket.join(socket.room);
@@ -135,7 +134,7 @@ io.sockets.on('connection', function(socket, callback){
 		if(client.length == 1){
 			io.of('/').in(data).clients(function(error, clients){
 				if (error) throw error;
-				if(clients.length >=2){
+				if(clients.length >=10){
 					socket.emit('roommu', {room: socket.room});
 					socket.emit('statuspindah', {room: data, status: 'penuh'});
 				}else{
@@ -165,7 +164,7 @@ io.sockets.on('connection', function(socket, callback){
 		}else{
 			io.of('/').in(data).clients(function(error, clients){
 				if (error) throw error;			
-				if(clients.length >= 2){
+				if(clients.length >= 10){
 					socket.emit('roommu', {room: socket.room});
 					socket.emit('statuspindah', {room: data, status: 'penuh'});
 				}else{
@@ -202,7 +201,7 @@ io.sockets.on('connection', function(socket, callback){
 		var cacahData = Object.keys(rooms).length;		
 		for(var i=0; i<cacahData; i++){
 			var client = io.sockets.adapter.rooms[Object.keys(rooms)[i]];
-			console.log(Object.keys(rooms)[i] + '[' + client.length + ']');
+			//console.log(Object.keys(rooms)[i] + '[' + client.length + ']');
 		}		
 		io.sockets.emit('roomlist', Object.keys(rooms));
 	}
@@ -210,7 +209,10 @@ io.sockets.on('connection', function(socket, callback){
 	//fungsi tambahan utk mengetahui jumlah client 
 	function roomClient(room){
 		io.of('/').in(socket.room).clients(function(error, clients){
-			if (error) throw error;			
+			if (error) throw error;	
+			if(clients.length < 1){
+				delete rooms[socket.room];
+			}
 			console.log('jumlah client room ' + socket.room + ' adalah ' + clients.length);
 			console.log(' ');
 		});
@@ -307,15 +309,10 @@ io.sockets.on('connection', function(socket, callback){
 							callback('Error: anda tidak boleh kick admin');
 							console.log(users[name].memberStatus + ' tidak dapat dikick oleh ' + socket.memberStatus);
 						}else{
-							users[name].emit('pesandikick', {nick: socket.nickname, memberStatus: socket.memberStatus, msg: msg});
-							users[name].emit('disablechat', {nick: name});
-							if(!socket.nickname) return;	
-							console.log(users[name] + 'Meninggalkan room ' + socket.room);							
-							users[name].leave(socket.room);							
-							delete users[name];
-							updateNicknames();
-							getRooms();
-							roomClient(socket.room);
+							var home = "";
+							socket.broadcast.emit('pesandikick', {nick: socket.nickname, memberStatus: socket.memberStatus, msg: msg});
+							socket.emit('pesandikick', {nick: socket.nickname, memberStatus: socket.memberStatus, msg: msg});
+							users[name].emit('disablechat', {nick: name, url: home});
 						}						
 					}else{						
 						callback('Error: anda bukan admin');
@@ -340,7 +337,7 @@ io.sockets.on('connection', function(socket, callback){
 			msg = msg.substr(8);
 			var ind = msg.indexOf(' ');
 			if(ind !== -1){
-				var name = msg.substring(0, ind);  
+				var name = msg.substring(0, ind);				
 				var msg = msg.substring(ind + 1);
 				if(name in users){
 					if(socket.memberStatus == 'Admin' || socket.memberStatus == 'Moderator'){
@@ -350,7 +347,6 @@ io.sockets.on('connection', function(socket, callback){
 						}else{
 							//users[name].ipaddress = data;
 							//var ipban = users[name].request.headers['x-forwarded-for'] || users[name].request.connection.remoteAddress;
-
 							var ip;
 							var stringip = users[name].request.headers['x-forwarded-for']; 
 							if (stringip) {
@@ -361,14 +357,10 @@ io.sockets.on('connection', function(socket, callback){
 							}							
 							ipbanned.push(ip);
 							console.log(ip);
-							users[name].emit('pesandibanned', {nick: socket.nickname, memberStatus: socket.memberStatus, msg: msg});
-							users[name].emit('disablechat', {nick: name});
-							console.log(users[name] + 'Meninggalkan room ' + socket.room);							
-							users[name].leave(socket.room);							
-							delete users[name];
-							updateNicknames();
-							getRooms();
-							roomClient(socket.room);
+							socket.broadcast.emit('pesandibanned', {nick: socket.nickname, memberStatus: socket.memberStatus, msg: msg});
+							socket.emit('pesandibanned', {nick: socket.nickname, memberStatus: socket.memberStatus, msg: msg});
+							var home = "";
+							users[name].emit('disablechat', {nick: name, url: home});
 							console.log(Object.keys(ipbanned).length);
 						}						
 					}else{						
@@ -444,7 +436,7 @@ io.sockets.on('connection', function(socket, callback){
 					
 					socket.emit('sender', {msg: msg, receiver: name, created: waktu});
 					users[name].emit('whisper', {msg: msg, sender: socket.nickname, created: waktu});
-					console.log('this is' + name);
+					console.log('this is ' + name);
 				}else{
 					callback('Error: Enter a valid users');
 				}				

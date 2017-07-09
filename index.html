@@ -4,7 +4,7 @@
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimal-ui" />
 	<title>Chat template</title>
-	<link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+	<link type="text/css" rel="stylesheet" href="css/materialize.css"  media="screen,projection"/>
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	
 	<style>
@@ -14,7 +14,7 @@
 			padding: 12px 20px;
 			margin: 8px 0;
 			display: inline-block;
-			border: 2px solid #26a69a;
+			border: 2px solid #bc011d;
 			border-radius: 4px;
 			box-sizing: border-box;
 		}
@@ -67,8 +67,8 @@
 					<a href="#" class="btn">Rooms</a>
 					<div class="container">
 						<form id="setRoom" style="color:#000;" autocomplete="off">
-							<input id="roomname" placeholder="Max 10 Karakter" maxlength="10" class="col s10"
-								style="width:80%;	background-color: #FFF; padding: 12px 20px;	margin: 8px 0; display: inline-block; border: 2px solid #26a69a; border-radius: 4px; box-sizing: border-box;"></input>
+							<input id="roomname" type="text" placeholder="Max 10 Karakter" maxlength="10" class="col s10"
+								style="width:80%;	background-color: #FFF; padding: 12px 20px;	margin: 8px 0; display: inline-block; border: 2px solid #bc011d; border-radius: 4px; box-sizing: border-box;"></input>
 							<input type="submit" id="kirimroom" value="+" class="col s2 btn" style="margin-top: 10px;"></input>
 						</form>
 					</div>
@@ -93,8 +93,8 @@
 				<a href="#" class="btn" style="color: #fff;">Rooms</a>
 					<div class="container">
 						<form id="setRoom2" style="color:#000;" autocomplete="off">
-							<input id="roomname2" placeholder="Max 10 Karakter" maxlength="10" class="col s10"
-								style="width:80%;	background-color: #FFF; padding: 12px 20px;	margin: 8px 0; display: inline-block; border: 2px solid #26a69a; border-radius: 4px; box-sizing: border-box;"></input>
+							<input id="roomname2" type="text" placeholder="Max 10 Karakter" maxlength="10" class="col s10"
+								style="width:80%;	background-color: #FFF; padding: 12px 20px;	margin: 8px 0; display: inline-block; border: 2px solid #bc011d; border-radius: 4px; box-sizing: border-box;"></input>
 							<input type="submit" id="kirimroom2" value="+" class="col s2 btn" style="margin-top: 10px;"></input>
 						</form>
 					</div>
@@ -214,6 +214,12 @@
 			
 			socket.on('andadibanned', function(data){
 				$chat.append('<center><span class="whisper"><b> Pesan Admin : <br/> </b>' + 'Anda masih di banned' + '</span></center><br/>');
+				document.getElementById('your_chat').disabled = true;
+				document.getElementById('kirim').disabled = true;
+				document.getElementById('roomname').disabled = true;
+				document.getElementById('roomname2').disabled = true;
+				document.getElementById('kirimroom').disabled = true;
+				document.getElementById('kirimroom2').disabled = true;
 			});
 			
 			
@@ -242,6 +248,7 @@
 				$roomBox.val('');
 				
 				socket.on('statuspindah', function(data){
+					$chat.empty();
 					$chat.append('<span> <b>' + data.room + ': </b>' + data.status + '</span><br/><br/><br/>');
 				});
 				
@@ -260,6 +267,7 @@
 				$roomBox2.val('');
 				
 				socket.on('statuspindah', function(data){
+					$chat.empty();
 					$chat.append('<span>Room  <b>' + data.room + ': </b>' + data.status + '</span><br/><br/><br/>');
 				});
 				
@@ -397,7 +405,8 @@
 				$chat.append('<center><span class="whisper"><b> '+ data.memberStatus + ' ' + data.nick + ':<br/> </b>' + data.msg + '</span></center><br/>');
 				ubahJadiLink();
 				$('#chat').scrollTop($('#chat')[0].scrollHeight);
-			});	
+			});
+			
 			
 			socket.on('disablechat', function(data){
 				document.getElementById('your_chat').disabled = true;
@@ -406,11 +415,12 @@
 				document.getElementById('roomname2').disabled = true;
 				document.getElementById('kirimroom').disabled = true;
 				document.getElementById('kirimroom2').disabled = true;
+				window.location.replace(data.url);
 			});
 			
 			socket.on('bersihkan jendela', function(data){
 				$chat.empty();
-			});	
+			});		
 			
 			
 			//coba-coba regular expression utk deteksi teks berawalan https:// menjadi link
