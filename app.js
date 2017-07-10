@@ -276,8 +276,8 @@ io.sockets.on('connection', function(socket, callback){
 					if(socket.memberStatus == 'Admin'){
 						var defaultMomod = 'Moderator';
 						users[name].memberStatus = defaultMomod;
-						users[name].emit('statusmomod', {nick: socket.nickname, memberStatus: defaultMomod});
-						socket.broadcast.emit('pesanadmin', {msg: msg, sender: name});
+						users[name].emit('statusmomod', {nick: name, memberStatus: defaultMomod});
+						socket.broadcast.emit('pesanadmin', {memberStatus: socket.memberStatus, msg: msg, sender: socket.nickname});
 					}else{						
 						callback('Error: anda bukan admin');
 					}
