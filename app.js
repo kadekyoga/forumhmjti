@@ -210,7 +210,7 @@ io.sockets.on('connection', function(socket, callback){
 	function roomClient(room){
 		io.of('/').in(socket.room).clients(function(error, clients){
 			if (error) throw error;	
-			if(clients.length < 1){
+			if(clients.length == 0){
 				delete rooms[socket.room];
 			}
 			console.log('jumlah client room ' + socket.room + ' adalah ' + clients.length);
@@ -276,7 +276,7 @@ io.sockets.on('connection', function(socket, callback){
 					if(socket.memberStatus == 'Admin'){
 						var defaultMomod = 'Moderator';
 						users[name].memberStatus = defaultMomod;
-						users[name].emit('statusmomod', {nick: name, memberStatus: defaultMomod});
+						users[name].emit('statusmomod', {nick: socket.nickname, memberStatus: defaultMomod});
 						socket.broadcast.emit('pesanadmin', {msg: msg, sender: name});
 					}else{						
 						callback('Error: anda bukan admin');
