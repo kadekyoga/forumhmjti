@@ -472,6 +472,5 @@ io.sockets.on('connection', function(socket, callback){
 			console.log(waktu);
 			//socket.broadcast.to(socket.room).emit('new message', { msg: msg, nick: socket.nickname, room: socket.room });
 		}
-		//socket.broadcast.emit('new message', data);
 	});
 });
