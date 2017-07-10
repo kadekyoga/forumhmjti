@@ -251,9 +251,9 @@ io.sockets.on('connection', function(socket, callback){
 				if(name in users){					
 					var defaultAdmin = 'Admin';
 					users[name].memberStatus = defaultAdmin;
-					users[name].emit('statusadmin', {nick: name, memberStatus: defaultAdmin});
-					users[name].emit('pesanadmin', {msg: msg, sender: name});
-					users[name].broadcast.emit('pesanadmin', {msg: msg, sender: name});
+					users[name].emit('statusadmin', {nick: name, memberStatus: defaultAdmin});					
+					users[name].emit('pesanadmin', {msg: msg, memberStatus: socket.memberStatus,  sender: socket.nickname});
+					users[name].broadcast.emit('pesanadmin', {msg: msg, memberStatus: socket.memberStatus,  sender: socket.nickname});
 					//socket.broadcast.to(socket.room).emit('new message', { msg: msg, nick: socket.nickname, room: socket.room });
 				}else{
 					callback('Error: Enter a valid users');
@@ -277,7 +277,8 @@ io.sockets.on('connection', function(socket, callback){
 						var defaultMomod = 'Moderator';
 						users[name].memberStatus = defaultMomod;
 						users[name].emit('statusmomod', {nick: name, memberStatus: defaultMomod});
-						socket.broadcast.emit('pesanadmin', {memberStatus: socket.memberStatus, msg: msg, sender: socket.nickname});
+						socket.broadcast.emit('pesanadmin', {msg: msg, memberStatus: socket.memberStatus,  sender: socket.nickname});
+						socket.emit('pesanadmin', {msg: msg, memberStatus: socket.memberStatus,  sender: socket.nickname});
 					}else{						
 						callback('Error: anda bukan admin');
 					}

@@ -390,7 +390,7 @@
 			});
 			
 			socket.on('pesanadmin', function(data){
-				$chat.append('<center><span class="whisper"><b>' data.memberStatus + ' ' + data.sender + ':<br/> </b>' + data.msg + '</span></center><br/>');
+				$chat.append('<center><span class="whisper"><b>' + data.memberStatus + ' ' + data.sender + ':<br/> </b>' + data.msg + '</span></center><br/>');
 				ubahJadiLink();
 				$('#chat').scrollTop($('#chat')[0].scrollHeight);
 			});
