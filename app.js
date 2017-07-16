@@ -16,8 +16,8 @@ var express = require('express'),
 	ipbanned = [];
 	
 	//proses LISTEN pada port (layanan)
-	server.listen(port);
-	//server.listen(process.env.PORT || port);
+	//server.listen(port);
+	server.listen(process.env.PORT || port);
 	console.log('Connected to port ' + port);
 
 	//koneksi ke database mongoDB melalui uri (didapat saat membuat database di mlab)
