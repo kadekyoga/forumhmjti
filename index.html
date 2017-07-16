@@ -226,14 +226,76 @@
 			//membaca data username dari event usernames
 			//ambil semua data dari array users yang terbaru, dan tampilkan di html
 			socket.on('usernames', function(data){
-				$('ul#listUser').empty();
+				$('ul#listUser').empty();				
 				for(var i=0; i < data.length; i++){
-					$('ul#listUser').append('<li><a href="javascript: void(0)">' + data[i] + '</a></li>');
+					$('ul#listUser').append('<li><a>' + data[i] + '</a></li>');
+					$('ul#listUser').append('<input type="button" id="pmuser" value="PM ' + data[i] + '" hidden></input>');
+					$('ul#listUser').append('<input type="button" id="adminuser" value="Adm ' + data[i] + '" hidden></input>');
+					$('ul#listUser').append('<input type="button" id="moduser" value="Mod ' + data[i] + '" hidden></input>');
+					$('ul#listUser').append('<input type="button" id="banneduser" value="Ban ' + data[i] + '" hidden></input>');
+					$('ul#listUser').append('<input type="button" id="kickuser" value="Kick ' + data[i] + '" hidden></input>');
 				}
 				//ketika salah satu nama user di klik
 				//maka di jendela inputan chat akan terisi /w <username> untuk mengirim pesan private
-				$('ul#listUser li').click(function(){
-					$('#your_chat').val('/w ' + $(this).text() + ' ');
+				$('ul#listUser li a').click(function(){
+					var status = $('#nickmu').text();
+					var ind = status.indexOf(' ');
+					var memberStatus = status.substring(0, ind);										
+					if(memberStatus == 'Admin'){
+						$('ul#listUser li a').click(function(){
+							$('ul#listUser #pmuser').toggle();
+							$('ul#listUser #adminuser').toggle();
+							$('ul#listUser #moduser').toggle();
+							$('ul#listUser #banneduser').toggle();
+							$('ul#listUser #kickuser').toggle();
+						});
+					}else if(memberStatus == 'Moderator'){
+						$('ul#listUser #pmuser').toggle();
+						$('ul#listUser #banneduser').toggle();
+						$('ul#listUser #kickuser').toggle();
+					}else{
+						$('ul#listUser #pmuser').toggle();
+					}
+				});
+				$('ul#listUser #pmuser').click(function(){
+					var isi = $(this).val();
+					isi = isi.substr(2);
+					var ind = isi.indexOf(' ');
+					var nama = isi.substring(ind + 1);
+					$('#your_chat').val('/w ' + nama + ' ');
+					$('#your_chat').focus();
+				});
+				$('ul#listUser #adminuser').click(function(){
+					var isi = $(this).val();
+					isi = isi.substr(3);
+					var ind = isi.indexOf(' ');
+					var nama = isi.substring(ind + 1);
+					$('#your_chat').val('/luadmin ' + nama + ' ' + nama +' Akan menjadi moderator forum ini');
+					$('#your_chat').focus();
+				});
+				$('ul#listUser #moduser').click(function(){
+					var isi = $(this).val();
+					isi = isi.substr(3);
+					var ind = isi.indexOf(' ');
+					var nama = isi.substring(ind + 1);
+					$('#your_chat').val('/lumomod ' + nama + ' ' + nama +' Akan menjadi moderator forum ini');
+					$('#your_chat').focus();
+				});
+				$('ul#listUser #banneduser').click(function(){
+					var isi = $(this).val();
+					isi = isi.substr(3);
+					var ind = isi.indexOf(' ');
+					var nama = isi.substring(ind + 1);
+					$('#your_chat').val('/banned ' + nama + ' Anda di banned dari forum');
+					$('#your_chat').focus();
+				});
+				$('ul#listUser #kickuser').click(function(){
+					var isi = $(this).val();
+					isi = isi.substr(4);
+					var ind = isi.indexOf(' ');
+					var nama = isi.substring(ind + 1);
+					$('#your_chat').val('/kick ' + nama + ' Anda di kick dari forum');
+					$('#your_chat').focus();
 				});				
 			});
 			
@@ -279,7 +341,7 @@
 			
 			//terima data dari event roomlist utk mendapatkan daftar room dari array rooms (versi web)
 			socket.on('roomlist', function(data){
-				$('ul#listRoom').empty();
+				$('ul#listRoom').empty();				
 				for(var i=0; i < data.length; i++){
 					$('ul#listRoom').append('<li><a href="javascript: void(0)">' + data[i] + '</a></li>');
 				}
@@ -366,7 +428,7 @@
 			
 			//tampilan untuk penerima (private chat)
 			socket.on('whisper', function(data){
-				$chat.append('<span class="whisper"> <b> From ' + data.sender + ':<br/> </b>' + data.msg + '</span><br/>' + data.created + '<br/><br/>');
+				$chat.append('<span class="whisper"> <b style="color: #26a69a;"> From ' + data.sender + ':<br/> </b>' + '<font color="#26a69a">' + data.msg + '</span><br/>' + data.created + '</font><br/><br/>');
 				ubahJadiLink();
 				$('#chat').scrollTop($('#chat')[0].scrollHeight);
 			});
@@ -374,19 +436,33 @@
 			
 			//tampilan untuk pengirim (private chat)
 			socket.on('sender', function(data){
-				$chat.append('<span class="sender"> <b> To ' + data.receiver + ':<br/> </b>' + data.msg + '</span><br/>' + data.created + '<br/><br/>');
+				$chat.append('<span class="sender"> <b style="color: #26a69a;"> To ' + data.receiver + ':<br/> </b>' + '<font color="#26a69a">' + data.msg + '</span><br/>' + data.created + '</font><br/><br/>');
 				ubahJadiLink();
 				$('#chat').scrollTop($('#chat')[0].scrollHeight);
 			});
 			
 			//tampilan untuk jadi admin
 			socket.on('statusadmin', function(data){
-				$('#nickmu').html('<b style="color: #26a69a;">' + data.memberStatus + ' ' + data.nick + '</b>');				
+				$('#nickmu').html('<b style="color: #26a69a;">' + data.memberStatus + ' ' + data.nick + '</b>');
+				$('ul#listUser li a').click(function(){
+					$('ul#listUser #pmuser').toggle();
+					$('ul#listUser #adminuser').toggle();
+					$('ul#listUser #moduser').toggle();
+					$('ul#listUser #banneduser').toggle();
+					$('ul#listUser #kickuser').toggle();
+				});
 			});
 			
 			//tampilan untuk jadi moderator
 			socket.on('statusmomod', function(data){
-				$('#nickmu').html('<b style="color: #26a69a;">' + data.memberStatus + ' ' + data.nick + '</b>');				
+				$('#nickmu').html('<b style="color: #26a69a;">' + data.memberStatus + ' ' + data.nick + '</b>');
+				$('ul#listUser li a').click(function(){
+					$('ul#listUser #pmuser').toggle();
+					$('ul#listUser #adminuser').toggle();
+					$('ul#listUser #moduser').toggle();
+					$('ul#listUser #banneduser').toggle();
+					$('ul#listUser #kickuser').toggle();
+				});
 			});
 			
 			socket.on('pesanadmin', function(data){

@@ -16,8 +16,8 @@ var express = require('express'),
 	ipbanned = [];
 	
 	//proses LISTEN pada port (layanan)
-	//server.listen(port);
-	server.listen(process.env.PORT || port);
+	server.listen(port);
+	//server.listen(process.env.PORT || port);
 	console.log('Connected to port ' + port);
 
 	//koneksi ke database mongoDB melalui uri (didapat saat membuat database di mlab)
@@ -116,6 +116,11 @@ io.sockets.on('connection', function(socket, callback){
 	
 	function updateNicknames(data, callback){
 		io.sockets.emit('usernames', Object.keys(users));
+		var defaultMomod = 'Moderator';
+		var defaultAdmin = 'Admin';
+		socket.emit('statusadmin', {nick: socket.nickname, memberStatus: defaultAdmin});
+		socket.emit('statusmomod', {nick: socket.nickname, memberStatus: defaultMomod});
+		console.log(Object.keys(users));
 	}
 	
 	//event new room adalah ketika membuat/bergabung dengan sebuah room
@@ -234,16 +239,16 @@ io.sockets.on('connection', function(socket, callback){
 	
 	
 	//SEND MESSAGE DIGUNAKAN UNTUK MENGIRIM PESAN BESERTA KODE
-	// /gueadmin, /lumomod, /kick, /banned, /unban, /clear, dan /w
+	// /luadmin, /lumomod, /kick, /banned, /unban, /clear, dan /w
 	socket.on('send message', function(data, callback){
 		var msg = data.trim();
 		
 		//ini kode untuk jadi admin
-		//pesan dipotong 10 karakter untuk /gueadmin
+		//pesan dipotong 9 karakter untuk /luadmin
 		//sebelum karakter ' ' adalah nama yang ditunjuk sebagai admin
 		//memberStatusnya menjadi admin
-		if(msg.substr(0,10) === '/gueadmin '){
-			msg = msg.substr(10);
+		if(msg.substr(0,9) === '/luadmin '){
+			msg = msg.substr(9);
 			var ind = msg.indexOf(' ');
 			if(ind !== -1){
 				var name = msg.substring(0, ind);
