@@ -414,6 +414,16 @@ io.sockets.on('connection', function(socket, callback){
 			}	
 		}
 		
+		else if(msg.substr(0,9) === '/clearall'){
+			msg = msg.substr(9);
+			var ind = msg.indexOf(' ');
+			if(!ind == 0){
+				io.sockets.emit('clearall', {nick: socket.nickname});			
+			}else{
+				callback('clear tidak memerlukan message, cukup /clear saja');
+			}	
+		}
+		
 		
 		//ini kode untuk whisper (private chat)
 		//pesan dipotong 3 karakter untuk /w

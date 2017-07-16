@@ -227,13 +227,14 @@
 			//ambil semua data dari array users yang terbaru, dan tampilkan di html
 			socket.on('usernames', function(data){
 				$('ul#listUser').empty();				
-				for(var i=0; i < data.length; i++){
-					$('ul#listUser').append('<li><a>' + data[i] + '</a></li>');
+				for(var i=0; i < data.length; i++){					
+					$('ul#listUser').append('<li><a>' + data[i] + '</a></li>');					
 					$('ul#listUser').append('<input type="button" id="pmuser" value="PM ' + data[i] + '" hidden></input>');
 					$('ul#listUser').append('<input type="button" id="adminuser" value="Adm ' + data[i] + '" hidden></input>');
 					$('ul#listUser').append('<input type="button" id="moduser" value="Mod ' + data[i] + '" hidden></input>');
 					$('ul#listUser').append('<input type="button" id="banneduser" value="Ban ' + data[i] + '" hidden></input>');
 					$('ul#listUser').append('<input type="button" id="kickuser" value="Kick ' + data[i] + '" hidden></input>');
+					$('ul#listUser').append('<input type="button" id="clearall" value="Clear" hidden></input>');
 				}
 				//ketika salah satu nama user di klik
 				//maka di jendela inputan chat akan terisi /w <username> untuk mengirim pesan private
@@ -241,20 +242,29 @@
 					var status = $('#nickmu').text();
 					var ind = status.indexOf(' ');
 					var memberStatus = status.substring(0, ind);										
-					if(memberStatus == 'Admin'){
-						$('ul#listUser li a').click(function(){
+					$('ul#listUser li a').click(function(){
+						if(memberStatus == 'Admin'){						
 							$('ul#listUser #pmuser').toggle();
 							$('ul#listUser #adminuser').toggle();
 							$('ul#listUser #moduser').toggle();
 							$('ul#listUser #banneduser').toggle();
 							$('ul#listUser #kickuser').toggle();
-						});
-					}else if(memberStatus == 'Moderator'){
-						$('ul#listUser #adminuser').toggle();
-						$('ul#listUser #moduser').toggle();
-					}else{
-						$('ul#listUser #pmuser').toggle();
-					}
+							$(this).text() + '[Admin]';
+						}else
+						if(memberStatus == 'Moderator'){						
+							$('ul#listUser #pmuser').toggle();
+							$('ul#listUser #adminuser').hide();
+							$('ul#listUser #moduser').hide();
+							$('ul#listUser #banneduser').toggle();
+							$('ul#listUser #kickuser').toggle();
+						}else{
+							$('ul#listUser #pmuser').toggle();
+							$('ul#listUser #adminuser').hide();
+							$('ul#listUser #moduser').hide();
+							$('ul#listUser #banneduser').hide();
+							$('ul#listUser #kickuser').hide();
+						}
+					});
 				});
 				$('ul#listUser #pmuser').click(function(){
 					var isi = $(this).val();
@@ -295,7 +305,11 @@
 					var nama = isi.substring(ind + 1);
 					$('#your_chat').val('/kick ' + nama + ' Anda di kick dari forum');
 					$('#your_chat').focus();
-				});				
+				});
+				$('ul#listUser #clearall').click(function(){
+					$('#your_chat').val('/clearall');
+					$('#your_chat').focus();
+				});								
 			});
 			
 			
@@ -443,25 +457,13 @@
 			//tampilan untuk jadi admin
 			socket.on('statusadmin', function(data){
 				$('#nickmu').html('<b style="color: #26a69a;">' + data.memberStatus + ' ' + data.nick + '</b>');
-				$('ul#listUser li a').click(function(){
-					$('ul#listUser #pmuser').toggle();
-					$('ul#listUser #adminuser').toggle();
-					$('ul#listUser #moduser').toggle();
-					$('ul#listUser #banneduser').toggle();
-					$('ul#listUser #kickuser').toggle();
-				});
+				
 			});
 			
 			//tampilan untuk jadi moderator
 			socket.on('statusmomod', function(data){
 				$('#nickmu').html('<b style="color: #26a69a;">' + data.memberStatus + ' ' + data.nick + '</b>');
-				$('ul#listUser li a').click(function(){
-					$('ul#listUser #pmuser').toggle();
-					$('ul#listUser #adminuser').toggle();
-					$('ul#listUser #moduser').toggle();
-					$('ul#listUser #banneduser').toggle();
-					$('ul#listUser #kickuser').toggle();
-				});
+				
 			});
 			
 			socket.on('pesanadmin', function(data){
@@ -495,9 +497,12 @@
 			
 			socket.on('bersihkan jendela', function(data){
 				$chat.empty();
-			});		
+			});	
 			
-			
+			socket.on('clearall', function(data){
+				$chat.empty();
+			});
+		
 			//coba-coba regular expression utk deteksi teks berawalan https:// menjadi link
 			function ubahJadiLink(){
 				var str = $chat.html();
