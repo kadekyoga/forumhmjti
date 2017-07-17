@@ -231,7 +231,7 @@
 					$('ul#listUser').append('<li><a>' + data[i] + '</a></li>');					
 					$('ul#listUser').append('<input type="button" id="pmuser" value="PM ' + data[i] + '" hidden></input>');
 					$('ul#listUser').append('<input type="button" id="adminuser" value="Adm ' + data[i] + '" hidden></input>');
-					$('ul#listUser').append('<input type="button" id="moduser" value="Mod ' + data[i] + '" hidden></input>');
+					$('ul#listUser').append('<input type="button" id="moduser" value="Shout ' + data[i] + '" hidden></input>');
 					$('ul#listUser').append('<input type="button" id="banneduser" value="Ban ' + data[i] + '" hidden></input>');
 					$('ul#listUser').append('<input type="button" id="kickuser" value="Kick ' + data[i] + '" hidden></input>');
 					$('ul#listUser').append('<input type="button" id="clearall" value="Clear" hidden></input>');
@@ -246,17 +246,24 @@
 						if(memberStatus == 'Admin'){						
 							$('ul#listUser #pmuser').toggle();
 							$('ul#listUser #adminuser').toggle();
-							$('ul#listUser #moduser').toggle();
+							$('ul#listUser #moduser').hide();
 							$('ul#listUser #banneduser').toggle();
 							$('ul#listUser #kickuser').toggle();
 							$(this).text() + '[Admin]';
 						}else
-						if(memberStatus == 'Moderator'){						
+						if(memberStatus == 'AdminDiskusi'){						
 							$('ul#listUser #pmuser').toggle();
 							$('ul#listUser #adminuser').hide();
 							$('ul#listUser #moduser').hide();
 							$('ul#listUser #banneduser').toggle();
 							$('ul#listUser #kickuser').toggle();
+						}else
+						if(memberStatus == 'Moderator'){						
+							$('ul#listUser #pmuser').toggle();
+							$('ul#listUser #adminuser').hide();
+							$('ul#listUser #moduser').toggle();
+							$('ul#listUser #banneduser').hide();
+							$('ul#listUser #kickuser').hide();
 						}else{
 							$('ul#listUser #pmuser').toggle();
 							$('ul#listUser #adminuser').hide();
@@ -279,7 +286,7 @@
 					isi = isi.substr(3);
 					var ind = isi.indexOf(' ');
 					var nama = isi.substring(ind + 1);
-					$('#your_chat').val('/luadmin ' + nama + ' ' + nama +' Akan menjadi moderator forum ini');
+					$('#your_chat').val('/luadmin ' + nama + ' ' + nama +' Akan menjadi admin forum ini');
 					$('#your_chat').focus();
 				});
 				$('ul#listUser #moduser').click(function(){
@@ -287,7 +294,7 @@
 					isi = isi.substr(3);
 					var ind = isi.indexOf(' ');
 					var nama = isi.substring(ind + 1);
-					$('#your_chat').val('/lumomod ' + nama + ' ' + nama +' Akan menjadi moderator forum ini');
+					$('#your_chat').val('/pesanmomod ');
 					$('#your_chat').focus();
 				});
 				$('ul#listUser #banneduser').click(function(){
@@ -295,7 +302,7 @@
 					isi = isi.substr(3);
 					var ind = isi.indexOf(' ');
 					var nama = isi.substring(ind + 1);
-					$('#your_chat').val('/banned ' + nama + ' Anda di banned dari forum');
+					$('#your_chat').val('/banned ' + nama + ' ' + nama + ' di banned dari forum');
 					$('#your_chat').focus();
 				});
 				$('ul#listUser #kickuser').click(function(){
@@ -303,7 +310,7 @@
 					isi = isi.substr(4);
 					var ind = isi.indexOf(' ');
 					var nama = isi.substring(ind + 1);
-					$('#your_chat').val('/kick ' + nama + ' Anda di kick dari forum');
+					$('#your_chat').val('/kick ' + nama + ' ' + nama + ' di kick dari forum');
 					$('#your_chat').focus();
 				});
 				$('ul#listUser #clearall').click(function(){
@@ -354,10 +361,9 @@
 			
 			//terima data dari event roomlist utk mendapatkan daftar room dari array rooms (versi web)
 			socket.on('roomlist', function(data){
-				$('ul#listRoom').empty();				
-				for(var i=0; i < data.length; i++){
-					$('ul#listRoom').append('<li><a href="javascript: void(0)">' + data[i] + '</a></li>');
-				}
+				$('ul#listRoom').empty();
+				$('ul#listRoom').append('<li><a href="javascript: void(0)">StudyClub</a></li>');
+				$('ul#listRoom').append('<li><a href="javascript: void(0)">ChitChat</a></li>');						
 				//jika salah satu daftar room di klik, maka akan mengirim nama room yang dipilih
 				//sebagai data ke event new rooms (bergabung dengan room)
 				$('ul#listRoom li').click(function(){
@@ -381,9 +387,8 @@
 			//sama seperti diatas (versi mobile)
 			socket.on('roomlist', function(data){
 				$('ul#listRoom2').empty();
-				for(var i=0; i < data.length; i++){
-					$('ul#listRoom2').append('<li><a href="javascript: void(0)">' + data[i] + '</a></li>');
-				}
+				$('ul#listRoom2').append('<li><a href="javascript: void(0)">StudyClub</a></li>');
+				$('ul#listRoom2').append('<li><a href="javascript: void(0)">ChitChat</a></li>');				
 				$('ul#listRoom2 li').click(function(){
 					$('#roomname2').val($(this).text());
 					socket.emit('new rooms', $('#roomname2').val(), function(data){
@@ -457,30 +462,32 @@
 			//tampilan untuk jadi admin
 			socket.on('statusadmin', function(data){
 				$('#nickmu').html('<b style="color: #26a69a;">' + data.memberStatus + ' ' + data.nick + '</b>');
-				
+				$('#chat').scrollTop($('#chat')[0].scrollHeight);
 			});
 			
 			//tampilan untuk jadi moderator
 			socket.on('statusmomod', function(data){
 				$('#nickmu').html('<b style="color: #26a69a;">' + data.memberStatus + ' ' + data.nick + '</b>');
-				
+				$('#chat').scrollTop($('#chat')[0].scrollHeight);
 			});
 			
 			socket.on('pesanadmin', function(data){
 				$chat.append('<center><span class="whisper"><b>' + data.memberStatus + ' ' + data.sender + ':<br/> </b>' + data.msg + '</span></center><br/>');
-				ubahJadiLink();
 				$('#chat').scrollTop($('#chat')[0].scrollHeight);
 			});
 			
 			socket.on('pesandikick', function(data){
 				$chat.append('<center><span class="whisper"><b> '+ data.memberStatus + ' ' + data.nick + ':<br/> </b>' + data.msg + '</span></center><br/>');
-				ubahJadiLink();
 				$('#chat').scrollTop($('#chat')[0].scrollHeight);
-			});	
+			});
+
+			socket.on('pesanmomod', function(data){
+				$chat.append('<center><span class="whisper"><b> ' + data.nick + ':<br/> </b>' + data.msg + '</span></center><br/>');
+				$('#chat').scrollTop($('#chat')[0].scrollHeight);
+			});				
 			
 			socket.on('pesandibanned', function(data){
 				$chat.append('<center><span class="whisper"><b> '+ data.memberStatus + ' ' + data.nick + ':<br/> </b>' + data.msg + '</span></center><br/>');
-				ubahJadiLink();
 				$('#chat').scrollTop($('#chat')[0].scrollHeight);
 			});
 			

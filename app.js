@@ -67,7 +67,30 @@ io.sockets.on('connection', function(socket, callback){
 	
 	function newUser(data, callback){
 		var defaultRoom = 'Lobby';
-		var defaultMemberStatus = 'Anggota';
+		
+		var nickkiriman = data.trim();
+		if(nickkiriman.substr(0, 10) === 'moderator/'){
+			var isidata = data.substr(10);
+			var ind = isidata.indexOf('/');
+			var nickmomod = isidata.substr(ind + 1);
+			var defaultMemberStatus = 'Moderator';
+			data = nickmomod + '[Moderator]';
+		}else if(nickkiriman.substr(0, 6) === 'admin/'){
+			nickkiriman = nickkiriman.substr(6);
+			var ind = nickkiriman.indexOf('/');
+			var pwdadmin = nickkiriman.substr(0, ind);
+			if(pwdadmin === 'hmjti'){
+				var nickadmin = nickkiriman.substr(ind + 1);
+				var defaultMemberStatus = 'Admin';
+				data = nickadmin + '[Admin]';
+			}else{
+				data = data;
+				var defaultMemberStatus = 'Anggota';
+			}			
+		}else{
+			var defaultMemberStatus = 'Anggota';
+		}
+				
 		
 		var ip;
 		var stringip = socket.request.headers['x-forwarded-for']; 
@@ -157,7 +180,6 @@ io.sockets.on('connection', function(socket, callback){
 					//event roommu akan mengirimkan room yang dimasuki oleh client
 					//yang dikirim sebagai informasi mengenari room saat itu client berada
 					socket.emit('roommu', {room: socket.room});
-					socket.emit('statuspindah', {room: socket.room, status: 'masih ada slot'});
 					var query = Chat.find({room: socket.room});
 					query.sort('-date').limit(10).exec(function(err, docs){
 						if(err) throw err;
@@ -187,7 +209,6 @@ io.sockets.on('connection', function(socket, callback){
 					var query = Chat.find({room: socket.room});
 					
 					socket.emit('roommu', {room: socket.room});
-					socket.emit('statuspindah', {room: socket.room, status: 'masih ada slot'});
 					query.sort('-date').limit(10).exec(function(err, docs){
 						if(err) throw err;
 						//console.log('sending old message');
@@ -254,7 +275,7 @@ io.sockets.on('connection', function(socket, callback){
 				var name = msg.substring(0, ind);
 				var msg = msg.substring(ind + 1);
 				if(name in users){					
-					var defaultAdmin = 'Admin';
+					var defaultAdmin = 'AdminDiskusi';
 					users[name].memberStatus = defaultAdmin;
 					users[name].emit('statusadmin', {nick: name, memberStatus: defaultAdmin});					
 					users[name].emit('pesanadmin', {msg: msg, memberStatus: socket.memberStatus,  sender: socket.nickname});
@@ -271,25 +292,16 @@ io.sockets.on('connection', function(socket, callback){
 		//pesan dipotong 9 karakter untuk /lumomod
 		//sebelum karakter ' ' adalah nama yang ditunjuk sebagai moderator
 		//memberStatusnya menjadi moderator
-		else if(msg.substr(0,9) === '/lumomod '){
-			msg = msg.substr(9);
+		else if(msg.substr(0,11) === '/pesanmomod'){
+			msg = msg.substr(11);
 			var ind = msg.indexOf(' ');
+			var msg = msg.substring(ind + 1);
 			if(ind !== -1){
-				var name = msg.substring(0, ind);
-				var msg = msg.substring(ind + 1);
-				if(name in users){
-					if(socket.memberStatus == 'Admin'){
-						var defaultMomod = 'Moderator';
-						users[name].memberStatus = defaultMomod;
-						users[name].emit('statusmomod', {nick: name, memberStatus: defaultMomod});
-						socket.broadcast.emit('pesanadmin', {msg: msg, memberStatus: socket.memberStatus,  sender: socket.nickname});
-						socket.emit('pesanadmin', {msg: msg, memberStatus: socket.memberStatus,  sender: socket.nickname});
-					}else{						
-						callback('Error: anda bukan admin');
-					}
-				}else{
-						callback('Error: tidak ada di user');
-				}					
+				if(socket.memberStatus == 'Moderator'){
+					socket.emit('pesanmomod', {nick: socket.nickname, memberStatus: socket.memberStatus, msg: msg});
+				}else{						
+					callback('Error: anda bukan moderator');
+				}				
 			}else{
 				callback('Error: Please enter a message for your whisper');
 			}	
@@ -310,8 +322,8 @@ io.sockets.on('connection', function(socket, callback){
 				var name = msg.substring(0, ind);  
 				var msg = msg.substring(ind + 1);
 				if(name in users){
-					if(socket.memberStatus == 'Admin' || socket.memberStatus == 'Moderator'){
-						if(socket.memberStatus == 'Moderator' && users[name].memberStatus == 'Admin'){
+					if(socket.memberStatus == 'Admin' || socket.memberStatus == 'AdminDiskusi'){
+						if(socket.memberStatus == 'AdminDiskusi' && users[name].memberStatus == 'Admin'){
 							callback('Error: anda tidak boleh kick admin');
 							console.log(users[name].memberStatus + ' tidak dapat dikick oleh ' + socket.memberStatus);
 						}else{
@@ -346,8 +358,8 @@ io.sockets.on('connection', function(socket, callback){
 				var name = msg.substring(0, ind);				
 				var msg = msg.substring(ind + 1);
 				if(name in users){
-					if(socket.memberStatus == 'Admin' || socket.memberStatus == 'Moderator'){
-						if(socket.memberStatus == 'Moderator' && users[name].memberStatus == 'Admin'){
+					if(socket.memberStatus == 'Admin' || socket.memberStatus == 'AdminDiskusi'){
+						if(socket.memberStatus == 'AdminDiskusi' && users[name].memberStatus == 'Admin'){
 							callback('Error: anda tidak boleh banned admin');
 							console.log(users[name].memberStatus + ' tidak dapat dibanned oleh ' + socket.memberStatus);
 						}else{
@@ -388,7 +400,7 @@ io.sockets.on('connection', function(socket, callback){
 			var ind = msg.indexOf(' ');
 			var msg = msg.substring(ind + 1);
 			if(ind !== -1){
-				if(socket.memberStatus == 'Admin' || socket.memberStatus == 'Moderator'){
+				if(socket.memberStatus == 'Admin' || socket.memberStatus == 'AdminDiskusi'){
 					ipbanned = [];
 					socket.broadcast.emit('pesandibanned', {nick: socket.nickname, memberStatus: socket.memberStatus, msg: msg});
 					socket.emit('pesandibanned', {nick: socket.nickname, memberStatus: socket.memberStatus, msg: msg});
