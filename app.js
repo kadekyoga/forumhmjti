@@ -299,6 +299,7 @@ io.sockets.on('connection', function(socket, callback){
 			if(ind !== -1){
 				if(socket.memberStatus == 'Moderator'){
 					socket.emit('pesanmomod', {nick: socket.nickname, memberStatus: socket.memberStatus, msg: msg});
+					socket.broadcast.emit('pesanmomod', {nick: socket.nickname, memberStatus: socket.memberStatus, msg: msg});
 				}else{						
 					callback('Error: anda bukan moderator');
 				}				
