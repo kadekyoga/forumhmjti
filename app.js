@@ -81,8 +81,18 @@ io.sockets.on('connection', function(socket, callback){
 			var pwdadmin = nickkiriman.substr(0, ind);
 			if(pwdadmin === 'hmjti'){
 				var nickadmin = nickkiriman.substr(ind + 1);
-				var defaultMemberStatus = 'Admin';
-				data = nickadmin + '[Admin]';
+				if(nickadmin + '[Admin]' in users){
+					if(nickadmin in users){
+						callback(false);
+						socket.emit('disablechat', {nick: name, url: home});
+					}else{
+						var defaultMemberStatus = 'Anggota';
+						data = nickadmin;
+					}
+				}else{
+					var defaultMemberStatus = 'Admin';
+					data = nickadmin + '[Admin]';
+				}
 			}else{
 				data = data;
 				var defaultMemberStatus = 'Anggota';
@@ -155,7 +165,10 @@ io.sockets.on('connection', function(socket, callback){
 		}
 	});
 	
-	function joinRoom(data, callback){		
+	function joinRoom(data, callback){
+		if(data == socket.room){
+			callback(false);
+		}else{
 		//apakah ada orang di dalam room? jika hanya 1 orang
 		//maka ketika orang tersebut keluar room, room akan dihapus
 		var client = io.sockets.adapter.rooms[socket.room];
@@ -176,6 +189,17 @@ io.sockets.on('connection', function(socket, callback){
 					console.log(socket.nickname + ' joined ' + socket.room);
 					roomClient(socket.room);
 					getRooms();
+					var client = io.sockets.adapter.rooms[socket.room];
+					if(client.length == 1){
+						delete users[socket.nickname];
+						socket.nickname = socket.nickname + '[Moderator]';
+						socket.memberStatus = 'Moderator';
+						users[socket.nickname] = socket;
+						updateNicknames();
+					}else{
+						socket.nickname = socket.nickname;
+						socket.memberStatus = 'Anggota';
+					}
 					
 					//event roommu akan mengirimkan room yang dimasuki oleh client
 					//yang dikirim sebagai informasi mengenari room saat itu client berada
@@ -206,6 +230,22 @@ io.sockets.on('connection', function(socket, callback){
 					console.log(socket.nickname + ' joined ' + socket.room);
 					roomClient(socket.room);
 					getRooms();
+					var client = io.sockets.adapter.rooms[socket.room];
+					if(client.length == 1){
+						delete users[socket.nickname];
+						socket.nickname = socket.nickname + '[Moderator]';
+						socket.memberStatus = 'Moderator';
+						users[socket.nickname] = socket;
+						updateNicknames();
+					}else{
+						socket.nickname = socket.nickname;
+						socket.memberStatus = 'Anggota';
+					}
+					
+					socket.join(socket.room);
+					console.log(socket.nickname + ' joined ' + socket.room);
+					roomClient(socket.room);
+					getRooms();
 					var query = Chat.find({room: socket.room});
 					
 					socket.emit('roommu', {room: socket.room});
@@ -217,6 +257,7 @@ io.sockets.on('connection', function(socket, callback){
 				}
 			});
 		}
+	}
 	}
 	
 	//mendapatkan room dan mendapatkan jumlah client dalam room
