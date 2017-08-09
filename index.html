@@ -23,6 +23,7 @@
 
 <body style="height: 100%; width:100%; overflow:hidden; background-image: url('images/wabg.jpg');">
 	<div id="nickWrap">
+		<!--BAGIAN FORM MASUKAN NICKNAME -->
 		<p><b> Masukkan Nickname anda : </b></p>		
 		<form id="setNick" autocomplete="off" class="col s10 m10 l10">
 			<input placeholder="Nickname: Max 8 Karakter" id="nickname" type="text" class="validate col s8 m9 l10">
@@ -30,6 +31,7 @@
 			<a id="help" class="btn">Help</a>
 		</form>
 		
+		<!-- BAGIAN TOMBOL HELP DI AWAL TAMPILAN -->
 		<div id="saranNickname">
 			<p id="nickError"></p>
 			<span id="nickError2">
@@ -50,7 +52,8 @@
 
 	<div id="contentWrap" style="display: none;">
 	<div class="row">
-		<div class="navigasi">
+	<!--BAGIAN SAMPING UNTUK VERSI MOBILE -->
+		<div class="navigasi">		
 			<nav>
 				<div class="nav-wrapper">
 				<a href="#" class="brand-logo center">HMJTI CHAT</a>
@@ -82,6 +85,7 @@
 			</nav>
 		</div>
 	
+		<!--BAGIAN SAMPING UNTUK VERSI WEB / DEVICE LAYAR BESAR -->
 		<div class="row col s0 m0 l3">
 			<div id="slide-out" class="side-nav fixed" style="height: 100%;">
 				<a href="#" class="btn" style="color: #fff;">Online Users</a>
@@ -106,15 +110,18 @@
 		</div>
 		
 		<div class="chatWrap col s12 m12 l9" style="height: 70vh;">
+			<!--BGIAN INFORMASI AKUN DI BAGIAN ATAS -->
 			<div id="akunmu" style="max-width: 97%; padding: 10px;">
 				<span id="nickmu"></span>
 				<span id="roommu"></span>
 				<span id="logout"></span>
 			</div>
 		
+			<!--BAGIAN JENDELA CHAT -->
 			<div id="chat" style="height:68vh; overflow-y: auto; max-width: 97%; word-wrap: break-word;">
 			</div>
 			
+			<!--BAGIAN FORM INPUT CHAT DAN BUTTON SEND -->
 			<div style="max-width: 97%; position:relative;">
 				<form id="input-field" autocomplete="off">
 					<input placeholder="Your Chat" id="your_chat" type="text" class="validate col s8 m9 l10">
@@ -128,6 +135,8 @@
 	
 	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 	<script src="js/materialize.js"></script>
+	
+	<!--BAGIAN JS UNTUK SWIPE BAGIAN SAMPING VERSI MOBILE -->
 	<script>
 		//initialize
 		$('.button-collapse').sideNav({
@@ -250,13 +259,6 @@
 							$('ul#listUser #kickuser').toggle();
 							$(this).text() + '[Admin]';
 						}else
-						if(memberStatus == 'AdminDiskusi'){						
-							$('ul#listUser #pmuser').toggle();
-							$('ul#listUser #adminuser').hide();
-							$('ul#listUser #moduser').hide();
-							$('ul#listUser #banneduser').toggle();
-							$('ul#listUser #kickuser').toggle();
-						}else
 						if(memberStatus == 'Moderator'){						
 							$('ul#listUser #pmuser').toggle();
 							$('ul#listUser #adminuser').hide();
@@ -272,6 +274,9 @@
 						}
 					});
 				});
+				
+				
+				
 				$('ul#listUser #pmuser').click(function(){
 					var isi = $(this).val();
 					isi = isi.substr(2);

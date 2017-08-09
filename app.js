@@ -316,7 +316,7 @@ io.sockets.on('connection', function(socket, callback){
 				var name = msg.substring(0, ind);
 				var msg = msg.substring(ind + 1);
 				if(name in users){					
-					var defaultAdmin = 'AdminDiskusi';
+					var defaultAdmin = 'Admin';
 					users[name].memberStatus = defaultAdmin;
 					users[name].emit('statusadmin', {nick: name, memberStatus: defaultAdmin});					
 					users[name].emit('pesanadmin', {msg: msg, memberStatus: socket.memberStatus,  sender: socket.nickname});
@@ -364,16 +364,11 @@ io.sockets.on('connection', function(socket, callback){
 				var name = msg.substring(0, ind);  
 				var msg = msg.substring(ind + 1);
 				if(name in users){
-					if(socket.memberStatus == 'Admin' || socket.memberStatus == 'AdminDiskusi'){
-						if(socket.memberStatus == 'AdminDiskusi' && users[name].memberStatus == 'Admin'){
-							callback('Error: anda tidak boleh kick admin');
-							console.log(users[name].memberStatus + ' tidak dapat dikick oleh ' + socket.memberStatus);
-						}else{
+					if(socket.memberStatus == 'Admin'){
 							var home = "";
 							socket.broadcast.emit('pesandikick', {nick: socket.nickname, memberStatus: socket.memberStatus, msg: msg});
 							socket.emit('pesandikick', {nick: socket.nickname, memberStatus: socket.memberStatus, msg: msg});
-							users[name].emit('disablechat', {nick: name, url: home});
-						}						
+							users[name].emit('disablechat', {nick: name, url: home});						
 					}else{						
 						callback('Error: anda bukan admin');
 					}
@@ -400,11 +395,7 @@ io.sockets.on('connection', function(socket, callback){
 				var name = msg.substring(0, ind);				
 				var msg = msg.substring(ind + 1);
 				if(name in users){
-					if(socket.memberStatus == 'Admin' || socket.memberStatus == 'AdminDiskusi'){
-						if(socket.memberStatus == 'AdminDiskusi' && users[name].memberStatus == 'Admin'){
-							callback('Error: anda tidak boleh banned admin');
-							console.log(users[name].memberStatus + ' tidak dapat dibanned oleh ' + socket.memberStatus);
-						}else{
+					if(socket.memberStatus == 'Admin'){
 							//users[name].ipaddress = data;
 							//var ipban = users[name].request.headers['x-forwarded-for'] || users[name].request.connection.remoteAddress;
 							var ip;
@@ -413,7 +404,7 @@ io.sockets.on('connection', function(socket, callback){
 								var stringip = stringip.split(',');
 								ip = stringip[0];
 							}else if (!ip) {
-								ip = socket.request.connection.remoteAddress;
+								ip = users[name].request.connection.remoteAddress;
 							}							
 							ipbanned.push(ip);
 							console.log(ip);
@@ -421,8 +412,7 @@ io.sockets.on('connection', function(socket, callback){
 							socket.emit('pesandibanned', {nick: socket.nickname, memberStatus: socket.memberStatus, msg: msg});
 							var home = "";
 							users[name].emit('disablechat', {nick: name, url: home});
-							console.log(Object.keys(ipbanned).length);
-						}						
+							console.log(Object.keys(ipbanned).length);						
 					}else{						
 						callback('Error: anda bukan admin');
 					}
